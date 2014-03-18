@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MPExAgent FrontEnd</title>
+<link rel="stylesheet" type="text/css" href="plstyle.css">
+<script src="jquery-1.11.0.min.js"></script>
+<script src="pljs.js"></script>
+</head>
+
+<body>
+<div class="plmain">
+
+<div id="plmenu">
+		<div class="stats">
+			<div id="statdate">
+			</div>
+			<button id="Holdings">Holdings</button>
+			<button id="Dividends">Dividends</button>
+			<button id="Deposit">Deposit</button>
+			<button id="TradeHistory">Trade History</button>
+			<button id="Logs">Logs</button>
+
+		</div>
+</div>
+
+<div id="pldividends" class="plbigblock">
+	<div class="plblocktitle">
+		Dividends
+	</div>
+	<div id="divilist">
+	</div>
+</div>
+<div id="plholdings" class="plbigblock">
+	<div class="plblocktitle">
+		Holdings
+	</div>
+	<div id="holdlist">
+	</div>
+</div>
+<div id="plhistrades" class="plbigblock">
+	<div class="plblocktitle">
+		TRADES HISTORY
+	</div>
+
+</div>
+<div id="pllogs" class="plbigblock">
+	<div class="plblocktitle">
+		Logs
+	</div>
+	<select id="loglist">
+	</select>
+	<div id="logcontents">
+	</div>
+</div>
+
+<div id="pldepositform" class="plbigblock">
+	<div class="plblocktitle">
+		DEPOSIT FORM
+	</div>
+	<div class="depositform">
+		<br>
+		<br>
+		<br>
+		<br>
+		Mpex Exchange Address : 1Fx3N5iFPDQxUKhhmDJqCMmi3U8Y7gSncx
+		<br>
+		Quoted Amount Is 5.005btc
+		<br>
+        <form>
+			FromAddress: <input type="text",name = "From"><br>
+			Amount: <input type="text",name = "Amount"><br>
+			ToAddress: <input type="text",name = "To"><br>
+		</form>
+		<br>
+		<font color="red"> 
+			Incoming Bitcoin that doesn't exactly match a quoted
+			sum will be simply kept, reported as profits and distributed to MPEx
+			shareholders
+		<font>
+	</div>
+</div>
+<div id="plgraph" class="plbigblock">
+	<div class="plblocktitle">
+		GRAPH
+	</div>
+	<div class="bsreceipt" id="bsrec">
+	</div>
+	<div id="tradetable" class="pltradetable">
+	</div>
+
+</div>
+
+
+<div id="plbuysell" onclick="javascript: MarkBuySell();">
+	<div class="plblocktitle">
+		BUY/SELL
+		Symbol
+		<select id="symbols">
+		</select>
+		<button id="Buy">Buy</button>
+		<button id="Sell">Sell</button>
+		<form id="bsform">
+			Amount:<input type="text" name="B/SAmount" id="amountinput"/>
+			Price:<input type="text" name="B/SPrice" id= "priceinput"/>
+		</form>
+		<br>
+	</div>
+</div>
+</div>
+
+
+<script>
+         $(document).ready(callStat());
+		 $(document).ready(callLogs());
+         $(document).ready(getMarketDepth());
+		 $(document).ready(addListeners());
+		 $(document).ready(addBuySellListeners());
+		 $(document).ready($('#plgraph').css({"display":"block"}));
+</script>
+
+</body>
+
+</html>

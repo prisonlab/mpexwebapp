@@ -1,0 +1,21 @@
+mode- noweb- agent funguje ako teraz, bez web frontendu
+      http- web aplikacia s http
+      https- web aplikacia s https
+auth- noauth- web aplikacia bez http autentifikacie
+    - plain- autentifikacia s heslami v plain texte, tvar suboru s heslami:
+             meno:heslo
+    - md5- autentifikacia s heslami zahashovanymi md5, tvar suboru:
+             meno:heslo zasifrovane md5
+    - sha1- autentifikacia s heslami zahashovanymi sha1, tvar suboru:
+             meno:heslo zasifrovane sha1
+    - ina autentifikacia sa da dorobit
+logpath- cesta k priecinku, kde sa budu ukladat logy, a z ktoreho sa budu
+         posielat logy na web aplikaciu
+webpath- cesta k priecinku s web aplikaciu- 5 suborov: -index.html
+                                                       -pljs.js
+                                                       -plstyle.css
+                                                       -config.conf
+                                                       -jquery-1.11.0.min.js
+keypath- cesta k suboru s ssl klucom
+certpath- cesta k suboru s ssl certifikatom
+passpath- cesta k suboru s menami a heslami k http autentifikacii

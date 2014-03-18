@@ -1,0 +1,25 @@
+.plclear { clear: both; }
+
+body { background: gray; }
+
+.orange { background: orange; }
+
+.plmain { background: lightgray; box-shadow: 3px 3px black; max-width: 940px; margin: auto; }
+
+.plblocktitle { width: 100%; font-family: Arial; font-size: 14px; text-align: center; }
+.stat { width: 100%; font-family: TimesNewRoman; font-size: 12px; text-align: left;} 
+
+#plmenu { background: white; box-shadow: 2px 2px black; width: 100%; position: relative; }
+#plbuysell { background: white; width: 100%; position: relative; }
+.plbigblock { width: 100%;height:1000px; position: relative; overflow-y:scroll;}
+#deposit_ammount{ text-align: left}
+
+#plhistrades { background: #FFCCFF; display: none; }
+#pldepositform { background: white; display: none; }
+#plgraph { background: lightblue; display: none; text-align:center; }
+#pldividends {background: red; display: none;}
+#plholdings{background: yellow; display: none;}
+.depositform { background: white; display: none;}
+#pltradegraph{ overflow-y: scroll;}
+.bsreceipt{position:relative;background:white;display:none;}
+#pllogs{ background:green;display: none;}
