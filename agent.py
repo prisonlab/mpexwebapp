@@ -33,6 +33,8 @@ import argparse
 
 import json
 
+import urllib2
+
 import logging,logging.config
 
 from twisted.python import log as twlog
@@ -43,6 +45,7 @@ log = logging.getLogger(__name__)
 
 SATOSHI=Decimal(100000000)
 
+#default config
 mode = 'noweb'
 auth = 'noauth'
 logpath = 'log'
@@ -548,25 +551,36 @@ class MPExAgent(MPEx):
     #@+node:jurov.20121005183137.2138: *3* exception
     def exception(self,value):
         raise ValueError("Test exception, data: %s" % value)
+    #sends list of all log files in log directory
     def sendloglist(self):
         def sendloglistCb(res):
-            return listdir('log')
+            return listdir(logpath)
         d = self.command('SENDLOGLIST')
         d.addCallback(sendloglistCb)
         return d
+    #sends the contents of the chosen log file
     def sendlog(self,name):
         cmd ='SENDLOG|%s'%(name)
         def sendlogCb(res):
-            f = open('log/'+name,'r')
+            f = open(logpath+'/'+name,'r')
             logcon=f.read()
             return logcon
         d = self.command(cmd)
         d.addCallback(sendlogCb)
         return d
+    #sends market data from mpex.co
+    #solves the mixed http/https data when using ssl in firefox
+    def sendmarket(self):
+        def sendmarketCb(res):
+            data = json.load(urllib2.urlopen('http://mpex.co/mpex-mktdepth.php'))
+            return data
+        d = self.command('SENDMARKET')
+        d.addCallback(sendmarketCb)
+        return d
     #@-others
 #@+node:jurov.20121005183137.2139: ** class RPCServer
 class RPCServer(ServerEvents):
-    methods =set(['neworder','stat','statjson','cancel','deposit','withdraw','exercise','echo','sendloglist','sendlog'])
+    methods = set(['neworder','stat','statjson','cancel','deposit','withdraw','exercise','echo','sendloglist','sendlog','sendmarket'])
     agent = None
     #@+others
     #@+node:jurov.20121005183137.2140: *3* log
@@ -637,7 +651,7 @@ LOGGING = {
 
 
 
-
+#hash functions for http authentication
 def hashmd5(username, password, passwordHash):
     return hashlib.md5(password).hexdigest()
 def hashsha1(username, password, passwordHash):
@@ -653,11 +667,10 @@ class HttpPasswordRealm(object):
 
     def requestAvatar(self, avatarId, mind, *interfaces):
         if IResource in interfaces:
-            # myresource is passed on regardless of user
             return (IResource, self.res, lambda: None)
         raise NotImplementedError()
 
-
+#parses ini file
 def readIniFile():
     config= ConfigParser.ConfigParser()
     config.read('conf.ini')
@@ -686,7 +699,7 @@ def readIniFile():
 #@+node:jurov.20121005183137.2144: ** main
 def main():
     readIniFile()
-    LOGGING['handlers']['file']['filename']=logpath+'mpexagent.log'
+    LOGGING['handlers']['file']['filename']=logpath+'/mpexagent.log'
     logging.config.dictConfig(LOGGING)
     observer = twlog.PythonLoggingObserver()
     observer.start()

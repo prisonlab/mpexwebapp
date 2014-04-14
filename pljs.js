@@ -155,7 +155,7 @@ function loadMPSICSymbols(){
 
 //loads market depth data from mpex.co
 function getMarketDepth(){
-	$.ajax({
+/*	$.ajax({
 		type: "GET",
 		url: "http://mpex.co/mpex-mktdepth-jsonp.php",
 	    dataType: "jsonp",
@@ -172,11 +172,33 @@ function getMarketDepth(){
 			setMarketDepth(results);
 			loadMPSICSymbols();
 		}
-	});
+	});*/
+	$.ajax({
+    type: 'POST',
+    url: document.URL+'jsonrpc/',
+    //crossDomain: true,
+    data: JSON.stringify({"jsonrpc": "2.0", "method": "sendmarket", "id": 1}),
+    dataType: 'json',
+    
+    error: function (responseData, textStatus, errorThrown) {
+       // alert("POST failed.");
+		console.log(responseData);
+		console.log(textStatus);
+		console.log(errorThrown);
+	
+    },
+	success: function(responseData, textStatus, jqXHR) {
+		stat=responseData;
+		console.log(responseData);
+		setMarketDepth(responseData);
+		loadMPSICSymbols();
+    }
+    });
 }
 
 function setMarketDepth(res){
-	marketDepth=res;
+//	marketDepth=res;
+	marketDepth=res.result;
 }
 
 //add event listener to every MPSIC symbol in select
@@ -313,7 +335,7 @@ function addBuySellListeners(){
 			success: function(responseData, textStatus, jqXHR) {
 	            receipt=document.getElementById("bsrec");
 				$(".bsreceipt").show("fast");
-				receipt.innerHTML=receipt.innerHTML+responseData.message+"<br>"+responseData.data+"<br>"+responseData.result+"<br>";
+				receipt.innerHTML=responseData.result.message+"<br>"+responseData.result.data+"<br>"+responseData.result.result+"<br>";
 				receipt.addEventListener("click",function(){
 					$(".bsreceipt").hide("fast");
 				}
@@ -322,7 +344,7 @@ function addBuySellListeners(){
 			error: function (responseData, textStatus, errorThrown) {
 			    receipt=document.getElementById("bsrec");
 				$(".bsreceipt").show("fast");
-				receipt.innerHTML=receipt.innerHTML+responseData.message+"<br>"+responseData.data+"<br>"+responseData.result+"<br>";
+				receipt.innerHTML=responseData.result.message+"<br>"+responseData.result.data+"<br>"+responseData.result.result+"<br>";
 				receipt.addEventListener("click",function(){
 					$(".bsreceipt").hide("fast");
 				}
@@ -359,14 +381,14 @@ function callStat(){
 //processes the result of the statjson command
 function processStat(){
 	statdate=document.getElementById("statdate");
-	statdate.innerHTML=statdate.innerHTML+stat.DateTime;
+	statdate.innerHTML=statdate.innerHTML+stat.result.DateTime;
 	holdings=document.getElementById("holdlist");
 	for(var i=0;i<stat.Holdings.length;i++){
-		holdings.innerHTML=holdings.innerHTML+stat.Holdings[i]+"<br>";
+		holdings.innerHTML=holdings.innerHTML+stat.result.Holdings[i]+"<br>";
 	}
 	dividends=document.getElementById("divilist");
 	for(var i=0;i<stat.Dividends.length;i++){
-		dividends.innerHTML=dividends.innerHTML+stat.Dividends[i]+"<br>";
+		dividends.innerHTML=dividends.innerHTML+stat.result.Dividends[i]+"<br>";
 	}
 }
 
