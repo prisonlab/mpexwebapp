@@ -5,22 +5,140 @@
 <link rel="stylesheet" type="text/css" href="plstyle.css">
 <script src="jquery-1.11.0.min.js"></script>
 <script src="pljs.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 </head>
 
 <body>
 <div class="plmain">
 
-<div id="plstat" onclick="javascript: MarkStat();"><div class="plblocktitle">STAT</div></div>
-<div id="plops" onclick="javascript: MarkOptions();"><div class="plblocktitle">OPTIONS</div></div>
-<div id="pldeposit" onclick="javascript: MarkDeposit();"><div class="plblocktitle">DEPOSIT</div></div>
-<div id="plbuysell" onclick="javascript: MarkBuySell();"><div class="plblocktitle">BUY/SELL</div></div>
+<div id="plstat" onclick="javascript: MarkStat();">
+	<div class="plblocktitle">
+		STAT
+		<div class="stats">
+			<br>
+			Issued Today 25.2.2014<br>
+			Dividends:<br>
+			23.2.2014: MPOE 3btc<br>
+			Orders:<br>
+			B 5 @ 0.00234 order#3<br>
+			S 3 @ 0.02542 order#4<br>
+		</div>
+	</div>
+</div>
+<div id="plops" onclick="javascript: MarkOptions();">
+	<div class="plblocktitle">
+		OPTIONS<br>
+		<ul id="options">
+			<li>	O.USD.C050T</li>
+			<li>	O.USD.C065T</li>
+			<li>	O.USD.C080T</li>
+			<li>	O.USD.C095T</li>
+			<li>	O.USD.C110T</li>
+			<li>	O.USD.C125T</li>
+			<li>	O.USD.C140T</li>
+			<li>	O.USD.C155T</li>
+			<li>	O.USD.C170T</li>
+			<li>	O.USD.C185T</li>
+			<li>	O.USD.C200T</li>
+			<li>	O.USD.C215T</li>
+			<li>	O.USD.C230T</li>
+			<li>    O.USD.C245T</li>
+			<li>    O.USD.C260T</li>
+			<li>	O.USD.C275T</li>
+			<li>    O.USD.C290T</li>
+			<li>    O.USD.C305T</li>
+			<li>    O.USD.C320T</li>
+	    </ul>
+    </div>
+</div>
+<div id="pldeposit" onclick="javascript: MarkDeposit();">
+	<div class="plblocktitle">
+		DEPOSIT
+		<div class="deposit_ammount">
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<form>
+				<input type="text">
+			</form>
+			<button>Deposit</button>
+		</div>
+	</div>
+</div>
+<table>
+	<tr class="abc" id="mp"/>
+</table>
+<div id="plbuysell" onclick="javascript: MarkBuySell();">
+	<div class="plblocktitle">
+		BUY/SELL
+		Symbol
+		<select id="symbols">
+		</select>
+		<button id="Buy">Buy</button>
+		<button id="Sell">Sell</button>
+		<form>
+			Amount:<input type="text",name="B/SAmount">
+			Price:<input type="text",name="B/SPrice">
+		</form>
+		<br>
+		<button id="MarketData">Market Data</button>
+	</div>
+</div>
 
-<div id="plhistrades" class="plbigblock"><div class="plblocktitle">TRADES HISTORY</div></div>
-<div id="pltradeoptions" class="plbigblock"><div class="plblocktitle">TRADE OPTIONS</div></div>
-<div id="pldepositform" class="plbigblock"><div class="plblocktitle">DEPOSIT FORM</div></div>
-<div id="plgraph" class="plbigblock"><div class="plblocktitle">GRAPH</div></div>
+<div id="plhistrades" class="plbigblock">
+	<div class="plblocktitle">
+		TRADES HISTORY
+	</div>
+</div>
+<div id="pltradeoptions" class="plbigblock">
+	<div class="plblocktitle">
+		TRADE OPTIONS
+	</div>
+</div>
+<div id="pldepositform" class="plbigblock">
+	<div class="plblocktitle">
+		DEPOSIT FORM
+	</div>
+	<div class="depositform">
+		<br>
+		<br>
+		<br>
+		<br>
+		Mpex Exchange Address : 1Fx3N5iFPDQxUKhhmDJqCMmi3U8Y7gSncx
+		<br>
+		Quoted Amount Is 5.005btc
+		<br>
+        <form>
+			FromAddress: <input type="text",name = "From"><br>
+			Amount: <input type="text",name = "Amount"><br>
+			ToAddress: <input type="text",name = "To"><br>
+		</form>
+		<br>
+		<font color="red"> 
+			Incoming Bitcoin that doesn't exactly match a quoted
+			sum will be simply kept, reported as profits and distributed to MPEx
+			shareholders
+		<font>
+	</div>
+</div>
+<div id="plgraph" class="plbigblock">
+	<div class="plblocktitle">
+		GRAPH
+	</div>
+	<div id="tradetable" class="pltradetable">
+	</div>
+</div>
 
 </div>
+
+<script>
+         $(document).ready(getMarketDepth());
+		 $(document).ready(addListeners());
+</script>
+
 </body>
 
 </html>

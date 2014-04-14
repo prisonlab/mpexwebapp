@@ -7,15 +7,19 @@ body { background: gray; }
 .plmain { background: lightgray; box-shadow: 3px 3px black; width: 940px; min-height: 770px; margin: auto; }
 
 .plblocktitle { width: 100%; font-family: Arial; font-size: 14px; text-align: center; }
+.stat { width: 100%; font-family: TimesNewRoman; font-size: 12px; text-align: left;} 
 
 #plstat { background: white; box-shadow: 2px 2px black; width: 250px; height: 250px; margin: 5px 0px 0px 5px; position: absolute; }
-#plops { background: white; box-shadow: 2px 2px black; width: 250px; height: 250px; margin: 260px 0px 0px 5px; position: absolute; }
-#pldeposit { background: white; box-shadow: 2px 2px black; width: 250px; height: 250px; margin: 515px 0px 0px 5px; position: absolute; }
-#plbuysell { background: white; box-shadow: 2px 2px black; width: 675px; height: 250px; margin: 515px 0px 0px 260px; position: absolute; }
-
+#plops { background: white; box-shadow: 2px 2px black; width: 250px; height: 250px; margin: 260px 0px 0px 5px; position: absolute;  }
+#pldeposit { background: white; box-shadow: 2px 2px black; width: 250px; height: 250px; margin: 515px 0px 0px 5px; position: absolute;}
+#plbuysell { background: white; box-shadow: 2px 2px black; width: 675px; height: 250px; margin: 515px 0px 0px 260px; position: absolute; text-align: left; }
+#options { height: 200px;text-align:left;overflow-y: scroll; }
 .plbigblock { box-shadow: 2px 2px black; width: 675px; height: 505px; margin: 5px 0px 0px 260px; position: absolute; }
+#deposit_ammount{ text-align: left}
 
 #plhistrades { background: #FFCCFF; display: none; }
 #pltradeoptions { background: lightgreen; display: none; }
-#pldepositform { background: yellow; display: none; }
-#plgraph { background: lightblue; display: none; }
+#pldepositform { background: white; display: none; }
+#plgraph { background: lightblue; display: none; text-align:center; overflow-y:scroll;}
+#depositform { background: white; display: none;}
+#pltradegraph{ overflow-y: scroll;}
