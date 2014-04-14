@@ -10,66 +10,24 @@
 <body>
 <div class="plmain">
 
-<div id="plstat" onclick="javascript: MarkStat();">
+<div id="plmenu">
 	<div class="plblocktitle">
-		STAT
+		Menu
+	</div>
+	<form id="statdate">
+
+	</form>
 		<div class="stats">
 			<br>
-			Issued Today 25.2.2014<br>
-			Dividends:<br>
-			23.2.2014: MPOE 3btc<br>
-			Orders:<br>
-			B 5 @ 0.00234 order#3<br>
-			S 3 @ 0.02542 order#4<br>
+			
+			<button id="Holdings">Holdings</button><br>
+			<button id="Dividends">Dividends</button><br>
+			<button id="Deposit">Deposit</button><br>
+			<button id="Log">Log</button><br>
+
 		</div>
-	</div>
 </div>
-<div id="plops" onclick="javascript: MarkOptions();">
-	<div class="plblocktitle">
-		OPTIONS<br>
-		<ul id="options">
-			<li>	O.USD.C050T</li>
-			<li>	O.USD.C065T</li>
-			<li>	O.USD.C080T</li>
-			<li>	O.USD.C095T</li>
-			<li>	O.USD.C110T</li>
-			<li>	O.USD.C125T</li>
-			<li>	O.USD.C140T</li>
-			<li>	O.USD.C155T</li>
-			<li>	O.USD.C170T</li>
-			<li>	O.USD.C185T</li>
-			<li>	O.USD.C200T</li>
-			<li>	O.USD.C215T</li>
-			<li>	O.USD.C230T</li>
-			<li>    O.USD.C245T</li>
-			<li>    O.USD.C260T</li>
-			<li>	O.USD.C275T</li>
-			<li>    O.USD.C290T</li>
-			<li>    O.USD.C305T</li>
-			<li>    O.USD.C320T</li>
-	    </ul>
-    </div>
-</div>
-<div id="pldeposit" onclick="javascript: MarkDeposit();">
-	<div class="plblocktitle">
-		DEPOSIT
-		<div class="deposit_ammount">
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<form>
-				<input type="text">
-			</form>
-			<button id= "Deposit">Deposit</button>
-		</div>
-	</div>
-</div>
-<table>
-	<tr class="abc" id="mp"/>
-</table>
+
 <div id="plbuysell" onclick="javascript: MarkBuySell();">
 	<div class="plblocktitle">
 		BUY/SELL
@@ -84,17 +42,27 @@
 		</form>
 		<br>
 	</div>
-</div>
 
+</div>
+<div id="pldividends" class="plbigblock">
+	<div class="plblocktitle">
+		Dividends
+	</div>
+	<div id="divilist">
+	</div>
+</div>
+<div id="plholdings" class="plbigblock">
+	<div class="plblocktitle">
+		Holdings
+	</div>
+	<div id="holdlist">
+	</div>
+</div>
 <div id="plhistrades" class="plbigblock">
 	<div class="plblocktitle">
 		TRADES HISTORY
 	</div>
-</div>
-<div id="pltradeoptions" class="plbigblock">
-	<div class="plblocktitle">
-		TRADE OPTIONS
-	</div>
+
 </div>
 <div id="pldepositform" class="plbigblock">
 	<div class="plblocktitle">
@@ -126,14 +94,18 @@
 	<div class="plblocktitle">
 		GRAPH
 	</div>
+	<div class="bsreceipt" id="bsrec">
+	</div>
 	<div id="tradetable" class="pltradetable">
 	</div>
+
 </div>
 
 </div>
+
 
 <script>
-         $(document).ready(initRPC());
+         $(document).ready(callStat());
          $(document).ready(getMarketDepth());
 		 $(document).ready(addListeners());
 		 $(document).ready(addBuySellListeners());

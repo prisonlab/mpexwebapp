@@ -1,31 +1,37 @@
 var marketDepth;
 var allSymbols;
 var rpcServer;
+var stat;
 
 function MarkStat () {
 	ColorizeRight ("#plstat");
 	ChangeWindow ("#plhistrades");
 }
 
-function MarkOptions () {
-	ColorizeRight ("#plops");
-	ChangeWindow ("#pltradeoptions");
-	
-}
+
 function addListeners(){
-	var optionsListed=document.getElementById("options").getElementsByTagName("li");
-	for(var i=0;i<optionsListed.length;i++){
-		optionsListed[i].addEventListener("click",function(){
-			showExerciseButton(this);
-	       	}
-			,true);
-	}
 	var depositButton=document.getElementById("Deposit");
 	depositButton.addEventListener("click",function(){
-	     $(".depositform").css({"display":"block"});
+		    ChangeWindow("#pldepositform");
 	}
 	,true);
 	
+	var logButton=document.getElementById("Log");
+    logButton.addEventListener("click",function(){
+			ChangeWindow("#plhistrades");
+			}
+	,true);
+	var holdingsButton=document.getElementById("Holdings");
+	holdingsButton.addEventListener("click",function(){
+		    ChangeWindow("#plholdings");
+	        }
+	,true);
+	var dividendsButton=document.getElementById("Dividends");
+	dividendsButton.addEventListener("click",function(){
+		    ChangeWindow("#pldividends");
+	        }
+	,true);
+
 }
 
 function showExerciseButton(option){
@@ -64,6 +70,8 @@ function ChangeWindow (win) {
 	$('#pltradeoptions').css({"display":"none"});
 	$('#pldepositform').css({"display":"none"});
 	$('#plgraph').css({"display":"none"});
+    $('#plholdings').css({"display":"none"});
+	$('#pldividends').css({"display":"none"});
 //	$('.depositform').css({"display":"none"});
 
 	$(win).css({"display":"block"});
@@ -199,20 +207,20 @@ function createTradeTable(symbol){
 			html+="<table id=\"buyselltable\">";
 			html+="<tr><th>BuyQTY</th><th>Price</th><th>SellQTY</th></tr>";
             //sort buys and sells
-			marketDepth[name].B.sort(function(a,b){return a[0]-b[0];});
+			marketDepth[name].B.sort(function(a,b){return b[0]-a[0];});
 			marketDepth[name].S.sort(function(a,b){return b[0]-a[0];});
-			//add buys
-			for(var i=0;i<marketDepth[name].B.length;i++){
-				buyqty=marketDepth[name].B[i][1];
-				price=marketDepth[name].B[i][0];
-				html+="<tr><td>"+buyqty+"</td><td>"+price+"</td><td></td></tr>";
-			}
 
 			//add sells
 			for(var i=0;i<marketDepth[name].S.length;i++){
 				sellqty=marketDepth[name].S[i][1];
 				price=marketDepth[name].S[i][0];
 				html+="<tr><td></td><td>"+price+"</td><td>"+sellqty+"</td></tr>";
+			}
+			//add buys
+			for(var i=0;i<marketDepth[name].B.length;i++){
+				buyqty=marketDepth[name].B[i][1];
+				price=marketDepth[name].B[i][0];
+				html+="<tr><td>"+buyqty+"</td><td>"+price+"</td><td></td></tr>";
 			}
 			html+="</table>";
 		}
@@ -264,16 +272,24 @@ function addBuySellListeners(){
 			data: JSON.stringify({"jsonrpc": "2.0", "method": "neworder","params":["B",symbolVal,amountVal,priceVal], "id": 1}),
 			dataType: 'json',
 			success: function(responseData, textStatus, jqXHR) {
-				var value = responseData.someKey;
+	            receipt=document.getElementById("bsrec");
+				$(".bsreceipt").show("fast");
+				receipt.innerHTML=receipt.innerHTML+responseData.message+"<br>"+responseData.data+"<br>"+responseData.result+"<br>";
+				receipt.addEventListener("click",function(){
+					$(".bsreceipt").hide("fast");
+				}
+				,true);
 			},
 			error: function (responseData, textStatus, errorThrown) {
-//				alert("POST failed.");
-				console.log(responseData);
-				console.log(textStatus);
-				console.log(errorThrown);
+			    receipt=document.getElementById("bsrec");
+				$(".bsreceipt").show("fast");
+				receipt.innerHTML=receipt.innerHTML+responseData.message+"<br>"+responseData.data+"<br>"+responseData.result+"<br>";
+				receipt.addEventListener("click",function(){
+					$(".bsreceipt").hide("fast");
+				}
+				,true);
 			}
 		});
-		//    console.log("buy");
 				}
 			,true);
 
@@ -292,52 +308,40 @@ function addBuySellListeners(){
 			data: JSON.stringify({"jsonrpc": "2.0", "method": "neworder","params":["S",symbolVal,amountVal,priceVal], "id": 1}),
 			dataType: 'json',
 			success: function(responseData, textStatus, jqXHR) {
-				var value = responseData.someKey;
+	            receipt=document.getElementById("bsrec");
+				$(".bsreceipt").show("fast");
+				receipt.innerHTML=receipt.innerHTML+responseData.message+"<br>"+responseData.data+"<br>"+responseData.result+"<br>";
+				receipt.addEventListener("click",function(){
+					$(".bsreceipt").hide("fast");
+				}
+				,true);
 			},
 			error: function (responseData, textStatus, errorThrown) {
-//				alert("POST failed.");
-				console.log(responseData);
-				console.log(textStatus);
-				console.log(errorThrown);
+			    receipt=document.getElementById("bsrec");
+				$(".bsreceipt").show("fast");
+				receipt.innerHTML=receipt.innerHTML+responseData.message+"<br>"+responseData.data+"<br>"+responseData.result+"<br>";
+				receipt.addEventListener("click",function(){
+					$(".bsreceipt").hide("fast");
+				}
+				,true);
 			}
 		});
-
 		}
 		,true);
 }
 
-function initRPC(){
-//	rpcServer=new $.JsonRpcClient({ajaxUrl:"http://localhost/jsonrpc:8007"});
+function callStat(){
 
-	//console.log(rpcServer);
-/*	rpcServer.call(
-			"statjson",[],
-			function (result){console.log("successs"+result);},
-			function (error){console.log("error"+error);}
-			);*/
-/*	$.ajax({url: "http://localhost:8007/jsorpc/",
-		type: "POST",
-		contentType: "application/json",
-		data: JSON.stringify({"jsonrpc": "2.0",
-			"method": "statjson", "params": [], "id": 1,
-		}),
-		dataType: "json",
-		success: function(response) {
-		    console.log(response.result);
-		},
-	    error: function(result){
-			console.log(result);
-		}
-	});*/
 	$.ajax({
     type: 'POST',
     url: 'http://localhost:8007/jsonrpc/',
     //crossDomain: true,
-    data: JSON.stringify({"jsonrpc": "2.0", "method": "echo","params": ["hello"], "id": 1}),
+    data: JSON.stringify({"jsonrpc": "2.0", "method": "statjson", "id": 1}),
     dataType: 'json',
     success: function(responseData, textStatus, jqXHR) {
-        var value = responseData.someKey;
+		stat=responseData;
 		console.log(responseData);
+		processStat();
     },
     error: function (responseData, textStatus, errorThrown) {
         alert("POST failed.");
@@ -348,3 +352,15 @@ function initRPC(){
 });
 }
 
+function processStat(){
+	statdate=document.getElementById("statdate");
+	statdate.innerHTML=statdate.innerHTML+stat.DateTime;
+	holdings=document.getElementById("holdlist");
+	for(var i=0;i<stat.Holdings.length;i++){
+		holdings.innerHTML=holdings.innerHTML+stat.Holdings[i]+"<br>";
+	}
+	dividends=document.getElementById("divilist");
+	for(var i=0;i<stat.Dividends.length;i++){
+		dividends.innerHTML=dividends.innerHTML+stat.Dividends[i]+"<br>";
+	}
+}
