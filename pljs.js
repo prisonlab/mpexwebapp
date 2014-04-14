@@ -8,7 +8,7 @@ function MarkStat () {
 	ChangeWindow ("#plhistrades");
 }
 
-
+//adds listeners to all of the buttons
 function addListeners(){
 	var depositButton=document.getElementById("Deposit");
 	depositButton.addEventListener("click",function(){
@@ -38,18 +38,6 @@ function addListeners(){
 	,true);
 }
 
-function showExerciseButton(option){
-	var options=document.getElementById("options").getElementsByTagName("li");
-	for(var i=0;i<options.length;i++){
-		
-		if(options[i].innerHTML.indexOf("<button>Exercise</button>")!=-1){
-			options[i].innerHTML=options[i].innerHTML.replace("<button>Exercise</button>","");
-		}
-	}
-	buttonHTML="<button>Exercise</button>";
-	option.innerHTML=option.innerHTML+buttonHTML;
-}
-
 function MarkDeposit () {
 	ColorizeRight ("#pldeposit");
 	ChangeWindow ("#pldepositform");
@@ -69,6 +57,7 @@ function ColorizeRight (mark) {
 	$(mark).css({"box-shadow":"6px 6px blue"});
 }
 
+//changes the central window
 function ChangeWindow (win) {
 	$('#plhistrades').css({"display":"none"});
 	$('#pltradeoptions').css({"display":"none"});
@@ -124,6 +113,7 @@ function ChangeWindow (win) {
 	}
 }*/
 
+//load all of the mpsic symbols from config.conf file
 function loadMPSICSymbols(){
 	var symbols=new Array();
 
@@ -150,6 +140,7 @@ function loadMPSICSymbols(){
 
 	getSymbols();
 
+	//creates html select list with loaded MPSIC values
 	function createSelect(sym){
 		allSymbols=sym;
         var select=document.getElementById("symbols");
@@ -162,6 +153,7 @@ function loadMPSICSymbols(){
 	}
 }
 
+//loads market depth data from mpex.co
 function getMarketDepth(){
 	$.ajax({
 		type: "GET",
@@ -172,6 +164,7 @@ function getMarketDepth(){
 	    error: function(result){
 			console.log("error");
 			console.log(result);
+			loadMPSICSymbols();
 		},
 		success: function(results){
 			console.log("success");
@@ -186,7 +179,7 @@ function setMarketDepth(res){
 	marketDepth=res;
 }
 
-//add event listener to every symbol in select
+//add event listener to every MPSIC symbol in select
 function addListenersToSelect(sym){
 	var listedSymbols=document.getElementById("symbols").getElementsByTagName("option");
     //console.log(listedSymbols.length);
@@ -236,6 +229,8 @@ function createTradeTable(symbol){
 	addTableListeners();
 }
 
+//adds listeners to every row of trade data, listeners fill the price form with 
+//price data from clicked row
 function addTableListeners(){
 	console.log("hello ");
 	rows=document.getElementById("buyselltable").getElementsByTagName("tr");
@@ -252,12 +247,15 @@ function addTableListeners(){
 	}
 }
 
+//fills the form with price from clicked table row
 function fillPrice(row){
 	price=document.getElementById("priceinput");
 	price.value=parseFloat(row.cells[1].innerHTML);
 }
 
+//adds listeners to buy/sell buttons
 function addBuySellListeners(){
+	console.log(document.URL);
 	buy=document.getElementById("Buy");
 	sell=document.getElementById("Sell");
 
@@ -272,7 +270,7 @@ function addBuySellListeners(){
 
 		$.ajax({
 			type: 'POST',
-			url: 'http://localhost:8007/jsonrpc/',
+			url: document.URL+'jsonrpc/',
 			//crossDomain: true,
 			data: JSON.stringify({"jsonrpc": "2.0", "method": "neworder","params":["B",symbolVal,amountVal,priceVal], "id": 1}),
 			dataType: 'json',
@@ -308,7 +306,7 @@ function addBuySellListeners(){
 	   priceVal=parseFloat(priceVal);
 	   $.ajax({
 			type: 'POST',
-			url: 'http://localhost:8007/jsonrpc/',
+			url: document.URL+'jsonrpc/',
 			//crossDomain: true,
 			data: JSON.stringify({"jsonrpc": "2.0", "method": "neworder","params":["S",symbolVal,amountVal,priceVal], "id": 1}),
 			dataType: 'json',
@@ -335,11 +333,12 @@ function addBuySellListeners(){
 		,true);
 }
 
+//calls the statjson command from agent.py
 function callStat(){
 
 	$.ajax({
     type: 'POST',
-    url: 'http://localhost:8007/jsonrpc/',
+    url: document.URL+'jsonrpc/',
     //crossDomain: true,
     data: JSON.stringify({"jsonrpc": "2.0", "method": "statjson", "id": 1}),
     dataType: 'json',
@@ -349,35 +348,15 @@ function callStat(){
 		processStat();
     },
     error: function (responseData, textStatus, errorThrown) {
-        alert("POST failed.");
+       // alert("POST failed.");
 		console.log(responseData);
 		console.log(textStatus);
 		console.log(errorThrown);
     }
 });
-
-	$.ajax({
-    type: 'POST',
-    url: 'http://localhost:8007/jsonrpc/',
-    //crossDomain: true,
-    data: JSON.stringify({"jsonrpc": "2.0", "method": "echo","params":["hello world"], "id": 1}),
-    dataType: 'json',
-    success: function(responseData, textStatus, jqXHR) {
-		stat=responseData;
-		console.log(responseData);
-		processStat();
-    },
-    error: function (responseData, textStatus, errorThrown) {
-        alert("POST failed.");
-		console.log(responseData);
-		console.log(textStatus);
-		console.log(errorThrown);
-    }
-});
-
-
 }
 
+//processes the result of the statjson command
 function processStat(){
 	statdate=document.getElementById("statdate");
 	statdate.innerHTML=statdate.innerHTML+stat.DateTime;
@@ -391,10 +370,11 @@ function processStat(){
 	}
 }
 
+//gets the list of all server logs
 function callLogs(){
 	$.ajax({
     type: 'POST',
-    url: 'http://localhost:8007/jsonrpc/',
+    url: document.URL+'jsonrpc/',
     //crossDomain: true,
     data: JSON.stringify({"jsonrpc": "2.0", "method": "sendloglist", "id": 1}),
     dataType: 'json',
@@ -404,12 +384,13 @@ function callLogs(){
 		makeLogList(responseData);
     },
     error: function (responseData, textStatus, errorThrown) {
-        alert("POST failed.");
+       // alert("POST failed.");
 		console.log(responseData);
 		console.log(textStatus);
 		console.log(errorThrown);
     }
 });
+    //creates the select list that contains names of all sent log files
     function makeLogList(data){
 		loglist=document.getElementById("loglist");
 		var html;
@@ -419,6 +400,9 @@ function callLogs(){
 		loglist.innerHTML=html;
 		addListenersToLog();
 	}
+
+    //adds listeners to every select value
+	//listener gets the contents of log file after clicking
     function addListenersToLog(){
 		logs=document.getElementById("loglist").getElementsByTagName("option");
 		for(var i=0;i<logs.length;i++){
@@ -426,7 +410,7 @@ function callLogs(){
 				logContents=document.getElementById("logcontents");
 					$.ajax({
 						type: 'POST',
-						url: 'http://localhost:8007/jsonrpc/',
+						url: document.URL+'jsonrpc/',
 						//crossDomain: true,
 						data: JSON.stringify({"jsonrpc": "2.0", "method": "sendlog","params":[this.value], "id": 1}),
 						dataType: 'json',
@@ -436,7 +420,7 @@ function callLogs(){
 							logContents.innerHTML=responseData.result.replace(/\n/g,"<br>");
 						},
 						error: function (responseData, textStatus, errorThrown) {
-							alert("POST failed.");
+		//					alert("POST failed.");
 							console.log(responseData);
 							console.log(textStatus);
 							console.log(errorThrown);

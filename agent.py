@@ -9,10 +9,19 @@
 from mpex import MPEx
 from pyparse import parseStat,parseDeposit,parseOrder,parseExercise
 from getpass import getpass
-from twisted.internet import reactor,ssl
-from twisted.web import static,server
+from twisted.internet import reactor,ssl,defer
+from twisted.web import static,server,resource
 from twisted.application import internet, service
+from twisted.web.resource import IResource
+from twisted.web.guard import HTTPAuthSessionWrapper,BasicCredentialFactory
+from twisted.cred import portal, checkers, credentials, error as credError
+from zope.interface import implements
+
 import traceback
+
+import hashlib
+
+import ConfigParser
 
 from jsonrpc.server import ServerEvents, JSON_RPC
 from pprint import pformat
@@ -33,6 +42,15 @@ from os import listdir
 log = logging.getLogger(__name__)
 
 SATOSHI=Decimal(100000000)
+
+mode = 'noweb'
+auth = 'noauth'
+logpath = 'log'
+webpath = 'static/web'
+keypath = 'keys/server.key'
+certpath = 'keys/server.crt'
+passpath = 'pass.pass'
+
 #@+node:jurov.20121030135122.2157: ** parse_args
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__, epilog=" -p PORT listen using tcp port PORT (default:8007)")
@@ -358,11 +376,6 @@ class MPExAgent(MPEx):
         """
         #TODO check whether arguments are numeric
         cmd = None
-        print(self)
-        print(orderType)
-        print(mpsic)
-        print(amount)
-        print(price)
         if(orderType == 'B'):
             cmd = 'BUY|'
         if(orderType == 'S'):
@@ -619,12 +632,64 @@ LOGGING = {
         },
     }
 }
+
+
+
+
+
+
+def hashmd5(username, password, passwordHash):
+    return hashlib.md5(password).hexdigest()
+def hashsha1(username, password, passwordHash):
+    return hashlib.sha1(password).hexdigest()
+def hashplain(username, password, passwordHash):
+    return password
+
+class HttpPasswordRealm(object):
+    implements(portal.IRealm)
+
+    def __init__(self, res):
+        self.res = res
+
+    def requestAvatar(self, avatarId, mind, *interfaces):
+        if IResource in interfaces:
+            # myresource is passed on regardless of user
+            return (IResource, self.res, lambda: None)
+        raise NotImplementedError()
+
+
+def readIniFile():
+    config= ConfigParser.ConfigParser()
+    config.read('conf.ini')
+    if(config.has_option('def','mode')):
+        global mode
+        mode=config.get('def','mode')
+    if(config.has_option('def','auth')):
+        global auth
+        auth=config.get('def','auth')
+    if(config.has_option('def','logpath')):
+        global logpath
+        logpath=config.get('def','logpath')
+    if(config.has_option('def','webpath')):
+        global webpath
+        webpath=config.get('def','webpath')
+    if(config.has_option('def','keypath')):
+        global keypath
+        keypath=config.get('def','keypath')
+    if(config.has_option('def','certpath')):
+        global certpath
+        certpath=config.get('def','certpath')
+    if(config.has_option('def','passpath')):
+        global passpath
+        passpath=config.get('def','passpath')
+
 #@+node:jurov.20121005183137.2144: ** main
 def main():
+    readIniFile()
+    LOGGING['handlers']['file']['filename']=logpath+'mpexagent.log'
     logging.config.dictConfig(LOGGING)
     observer = twlog.PythonLoggingObserver()
     observer.start()
-    webroot = static.File('/static/web')
 
     args = parse_args()
     try:
@@ -635,13 +700,35 @@ def main():
         mpexagent.passphrase = getpass("Enter your GPG passphrase: ")
         root = JSON_RPC().customize(RPCServer)
         root.eventhandler.agent = mpexagent
-        webroot.putChild('jsonrpc', root)
-        site = server.Site(webroot)
+
+        if(mode != 'noweb'):
+            webroot = static.File(webpath)
+            webroot.putChild('jsonrpc', root)
+            root = webroot
+            if(auth != 'noauth'):
+                if(auth == 'md5'):
+                    hashfunc = hashmd5
+                if(auth == 'sha1'):
+                    hashfunc = hashsha1
+                if(auth == 'plain'):
+                    hashfunc = hashplain
+
+                realm = HttpPasswordRealm(root)
+                p=portal.Portal(realm,[checkers.FilePasswordDB(passpath,delim=":",hash=hashfunc)])
+                credentialFactory = BasicCredentialFactory("MpexAgent")
+                protected_resource = HTTPAuthSessionWrapper(p, [credentialFactory])
+                root=protected_resource
+                
+        site = server.Site(root)
         bindaddr = '*:' if args.listen_addr == '' else args.listen_addr + ':'
         log.info('Listening on %s%d...', bindaddr, args.port)
-#        reactor.listenTCP(args.port, site, interface=args.listen_addr)
-        reactor.listenSSL(args.port,site,ssl.DefaultOpenSSLContextFactory('keys/server.key','keys/server.crt'))
+
+        if(mode != 'https'):
+            reactor.listenTCP(args.port, site, interface=args.listen_addr)
+        else:
+            reactor.listenSSL(args.port,site,ssl.DefaultOpenSSLContextFactory(keypath,certpath))
         reactor.run()
+
     except KeyboardInterrupt:
         print '^C received, shutting down server'
         server.socket.close()

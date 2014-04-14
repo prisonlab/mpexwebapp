@@ -21,5 +21,5 @@ body { background: gray; }
 #plholdings{background: yellow; display: none;}
 .depositform { background: white; display: none;}
 #pltradegraph{ overflow-y: scroll;}
-.bsreceipt{position:absolute;background:white;margin: 30px 0px 0px 160px;width:300px;height:200px;display:none;}
+.bsreceipt{position:relative;background:white;display:none;}
 #pllogs{ background:green;display: none;}
