@@ -4,8 +4,8 @@
 <title>MPExAgent FrontEnd</title>
 <link rel="stylesheet" type="text/css" href="plstyle.css">
 <script src="jquery-1.11.0.min.js"></script>
+<script src="jsonrpc.js"></script>
 <script src="pljs.js"></script>
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 </head>
 
 <body>
@@ -79,12 +79,11 @@
 		</select>
 		<button id="Buy">Buy</button>
 		<button id="Sell">Sell</button>
-		<form>
-			Amount:<input type="text",name="B/SAmount">
-			Price:<input type="text",name="B/SPrice">
+		<form id="bsform">
+			Amount:<input type="text" name="B/SAmount" id="amountinput"/>
+			Price:<input type="text" name="B/SPrice" id= "priceinput"/>
 		</form>
 		<br>
-		<button id="MarketData">Market Data</button>
 	</div>
 </div>
 
@@ -137,6 +136,7 @@
 <script>
          $(document).ready(getMarketDepth());
 		 $(document).ready(addListeners());
+		 $(document).ready(addBuySellListeners());
 </script>
 
 </body>

@@ -1,5 +1,6 @@
 var marketDepth;
 var allSymbols;
+var rpcServer;
 
 function MarkStat () {
 	ColorizeRight ("#plstat");
@@ -77,7 +78,7 @@ function ChangeWindow (win) {
 	$(".depositform").hide();
 }
 
-//ziskaj vsetky MPSIC symboly z mpex.coinbr.com
+//get all MPSIC symbols from mpex.coinbr.com
 function getMPSICSymbols(){
     var symbols=new Array();
 
@@ -106,7 +107,7 @@ function getMPSICSymbols(){
 	}
 
 	getSymbols();
-	//vytvor select menu zo stiahnutych symbolov 
+	//create select menu from downloaded symbols
     function createSelect(sym){
 		allSymbols=sym;
         var select=document.getElementById("symbols");
@@ -120,7 +121,6 @@ function getMPSICSymbols(){
 }
 
 function getMarketDepth(){
-	console.log("i was here");
 	$.ajax({
 		type: "GET",
 		url: "http://mpex.co/mpex-mktdepth-jsonp.php",
@@ -139,20 +139,18 @@ function getMarketDepth(){
 		}
 	});
 }
+
 function setMarketDepth(res){
 	marketDepth=res;
 }
 
-//na kazdy symbol v selecte pridaj listener na kliknutie
+//add event listener to every symbol in select
 function addListenersToSelect(sym){
 	var listedSymbols=document.getElementById("symbols").getElementsByTagName("option");
     //console.log(listedSymbols.length);
 	for(var i=0;i<listedSymbols.length;i++){
-		console.log(listedSymbols.length);
 
         listedSymbols[i].addEventListener("click",function(){
-		    console.log(this);
-			console.log("hello");
 			createTradeTable(this);
 	       	}
 			,true);
@@ -160,40 +158,28 @@ function addListenersToSelect(sym){
 
 }
 
-//vytvor tabulku pre dany symbol podla rss dat
+//create table for selected symbol from json data
 function createTradeTable(symbol){
-	console.log("i wa her");
 	var graph=document.getElementById("tradetable");
-//	var buys=new Array();
-//	var sells=new Array();
 	var html;
 	html="<br>"+symbol.value+"<br>";
-    console.log("i was here");
-	//najdi vsetky predaje z rss podla symbolu
-/*	for(var i=0;i<marketDepth.length;i++){
-		if(rssData.feed.entries[i].title.indexOf(symbol.value)!=-1){
-			if(rssData.feed.entries[i].content.indexOf("sold")!=-1){
-				sells.push(rssData.feed.entries[i]);
-			}else buys.push(rssData.feed.entries[i]);
-		}
-	}*/
 
-	//vytvor z nich tabulku
-//	console.log(B.length);
-//	console.log(S.length);
 	name=symbol.value;
 	if(marketDepth[name]!=undefined){
 		if(marketDepth[name].B.length>0||marketDepth[name].S.length>0){
-			html+="<table>";
+			html+="<table id=\"buyselltable\">";
 			html+="<tr><th>BuyQTY</th><th>Price</th><th>SellQTY</th></tr>";
-			//pridaj buys
+            //sort buys and sells
+			marketDepth[name].B.sort(function(a,b){return a[0]-b[0];});
+			marketDepth[name].S.sort(function(a,b){return b[0]-a[0];});
+			//add buys
 			for(var i=0;i<marketDepth[name].B.length;i++){
 				buyqty=marketDepth[name].B[i][1];
 				price=marketDepth[name].B[i][0];
 				html+="<tr><td>"+buyqty+"</td><td>"+price+"</td><td></td></tr>";
 			}
 
-			//pridaj sells
+			//add sells
 			for(var i=0;i<marketDepth[name].S.length;i++){
 				sellqty=marketDepth[name].S[i][1];
 				price=marketDepth[name].S[i][0];
@@ -203,43 +189,92 @@ function createTradeTable(symbol){
 		}
 	}
 	
-	//vloz vytvorene html do grafu
+	//insert created html and add listeners
 	graph.innerHTML=html;
+	addTableListeners();
 }
-//Nacitaj RSS feed nakupov a predajov akcii na mpex.co
-//z tychto dat sa budu zostavovat tabulky pri kupe/predaji akcie
-/*
-function loadRSS(){
-	var abc=document.getElementById("mp");
-	console.log(abc);
-	google.load("feeds","1");
 
-      function init() {
-      var feed = new google.feeds.Feed("http://mpex.co/mpex-rss.php");
-	  feed.setNumEntries(50);
-	  feed.includeHistoricalEntries();
-      feed.load(function(result) {
-        if (!result.error) {
-			localStorage.setItem("feedSaved",JSON.stringify(result));
-          var container = document.getElementById("feed");
-          for (var i = 0; i < result.feed.entries.length; i++) {
-            var entry = result.feed.entries[i];
-            var div = document.createElement("div");
-            div.appendChild(document.createTextNode(entry.title));
-            container.appendChild(div);
-          }
-			console.log(result);
-			setRss(result);
-        }
-		addListenersToSelect(allSymbols);
-      });
-    }
-    google.setOnLoadCallback(init);
-	var feed=JSON.parse(localStorage.getItem("feedSaved"));
-	console.log(feed);
-	rssData=feed;
-	addListenersToSelect(allSymbols);
+function addTableListeners(){
+	console.log("hello ");
+	rows=document.getElementById("buyselltable").getElementsByTagName("tr");
+     	console.log(rows.length);
+		console.log(rows);
+	if((rows)!=undefined){
+		for(var i=1;i<rows.length;i++){
+			console.log("i was here");
+		    rows[i].addEventListener("click",function(){
+	             fillPrice(this);
+	       	}
+			,true);
+		}
+	}
 }
-function setRss(res){
-	rssData=res;
+
+function fillPrice(row){
+	price=document.getElementById("priceinput");
+	price.value=parseFloat(row.cells[1].innerHTML);
+}
+
+function addBuySellListeners(){
+	buy=document.getElementById("Buy");
+	sell=document.getElementById("Sell");
+
+	buy.addEventListener("click",function(){
+		    //    console.log("buy");
+				histlog=document.getElementById("plhistrades");
+				amountVal=document.getElementById("amountinput").value;
+				symbolVal=document.getElementById("symbols").value;
+				priceVal=document.getElementById("priceinput").value;
+				histlog.innerHTML=histlog.innerHTML+"<br>"+"B "+symbolVal+" "+amountVal+"@"+priceVal+"satoshi";
+			}
+			,true);
+
+	sell.addEventListener("click",function(){
+		    //    console.log("sell");
+		       histlog=document.getElementById("plhistrades");
+			   amountVal=document.getElementById("amountinput").value;
+			   symbolVal=document.getElementById("symbols").value;
+		       priceVal=document.getElementById("priceinput").value;
+			   histlog.innerHTML=histlog.innerHTML+"<br>"+"S "+symbolVal+" "+amountVal+"@"+priceVal+"satoshi";
+			}
+			,true);
+}
+/*
+function initRPC(){
+	rpcServer=new $.JsonRpcClient({ajaxUrl:"http://localhost/jsonrpc:8007"});
+
+	//console.log(rpcServer);
+	rpcServer.call(
+			"statjson",[],
+			function (result){console.log("successs"+result);},
+			function (error){console.log("error"+error);}
+			);
+	$.ajax({url: "http://localhost/jsorpc/:8007",
+		type: "POST",
+		contentType: "application/json",
+		data: JSON.stringify({"jsonrpc": "2.0",
+			"method": "statjson", "params": [], "id": 1,
+		}),
+		dataType: "json",
+		success: function(response) {
+		    console.log(response.result);
+		},
+	    error: function(result){
+			console.log(result);
+		}
+	});
+	$.ajax({
+    type: 'POST',
+    url: 'http://localhost/jsonrpc/:8007',
+    crossDomain: true,
+    data: '{"some":"json"}',
+    dataType: 'jsonp',
+    success: function(responseData, textStatus, jqXHR) {
+        var value = responseData.someKey;
+    },
+    error: function (responseData, textStatus, errorThrown) {
+        alert('POST failed.');
+    }
+});
 }*/
+
