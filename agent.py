@@ -9,7 +9,7 @@
 from mpex import MPEx
 from pyparse import parseStat,parseDeposit,parseOrder,parseExercise
 from getpass import getpass
-from twisted.internet import reactor
+from twisted.internet import reactor,ssl
 #, ssl
 from twisted.web import server
 import traceback
@@ -27,6 +27,8 @@ import json
 import logging,logging.config
 
 from twisted.python import log as twlog
+
+from os import listdir
 
 log = logging.getLogger(__name__)
 
@@ -356,6 +358,11 @@ class MPExAgent(MPEx):
         """
         #TODO check whether arguments are numeric
         cmd = None
+        print(self)
+        print(orderType)
+        print(mpsic)
+        print(amount)
+        print(price)
         if(orderType == 'B'):
             cmd = 'BUY|'
         if(orderType == 'S'):
@@ -520,14 +527,33 @@ class MPExAgent(MPEx):
         return d
     #@+node:jurov.20121005183137.2137: *3* echo
     def echo(self,value):
-        return "OK " + value
+        def echoCb(res):
+            return "OK "+ value
+        d = self.command('ECHO')
+        d.addCallback(echoCb)
+        return d
     #@+node:jurov.20121005183137.2138: *3* exception
     def exception(self,value):
         raise ValueError("Test exception, data: %s" % value)
+    def sendloglist(self):
+        def sendloglistCb(res):
+            return listdir('log')
+        d = self.command('SENDLOGLIST')
+        d.addCallback(sendloglistCb)
+        return d
+    def sendlog(self,name):
+        cmd ='SENDLOG|%s'%(name)
+        def sendlogCb(res):
+            f = open('log/'+name,'r')
+            logcon=f.read()
+            return logcon
+        d = self.command(cmd)
+        d.addCallback(sendlogCb)
+        return d
     #@-others
 #@+node:jurov.20121005183137.2139: ** class RPCServer
 class RPCServer(ServerEvents):
-    methods = set(['neworder','stat','statjson','cancel','deposit','withdraw','exercise','echo'])
+    methods =set(['neworder','stat','statjson','cancel','deposit','withdraw','exercise','echo','sendloglist','sendlog'])
     agent = None
     #@+others
     #@+node:jurov.20121005183137.2140: *3* log
@@ -576,7 +602,7 @@ LOGGING = {
         'class': 'logging.handlers.TimedRotatingFileHandler',
         'level': 'DEBUG',
         'formatter': 'standard',
-        'filename': 'mpexagent.log',
+        'filename': 'log/mpexagent.log',
         'when': 'd',
         'utc': True,
      },

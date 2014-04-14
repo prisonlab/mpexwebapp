@@ -11,39 +11,18 @@
 <div class="plmain">
 
 <div id="plmenu">
-	<div class="plblocktitle">
-		Menu
-	</div>
-	<form id="statdate">
-
-	</form>
 		<div class="stats">
-			<br>
-			
-			<button id="Holdings">Holdings</button><br>
-			<button id="Dividends">Dividends</button><br>
-			<button id="Deposit">Deposit</button><br>
-			<button id="Log">Log</button><br>
+			<div id="statdate">
+			</div>
+			<button id="Holdings">Holdings</button>
+			<button id="Dividends">Dividends</button>
+			<button id="Deposit">Deposit</button>
+			<button id="TradeHistory">Trade History</button>
+			<button id="Logs">Logs</button>
 
 		</div>
 </div>
 
-<div id="plbuysell" onclick="javascript: MarkBuySell();">
-	<div class="plblocktitle">
-		BUY/SELL
-		Symbol
-		<select id="symbols">
-		</select>
-		<button id="Buy">Buy</button>
-		<button id="Sell">Sell</button>
-		<form id="bsform">
-			Amount:<input type="text" name="B/SAmount" id="amountinput"/>
-			Price:<input type="text" name="B/SPrice" id= "priceinput"/>
-		</form>
-		<br>
-	</div>
-
-</div>
 <div id="pldividends" class="plbigblock">
 	<div class="plblocktitle">
 		Dividends
@@ -64,6 +43,16 @@
 	</div>
 
 </div>
+<div id="pllogs" class="plbigblock">
+	<div class="plblocktitle">
+		Logs
+	</div>
+	<select id="loglist">
+	</select>
+	<div id="logcontents">
+	</div>
+</div>
+
 <div id="pldepositform" class="plbigblock">
 	<div class="plblocktitle">
 		DEPOSIT FORM
@@ -101,14 +90,32 @@
 
 </div>
 
+
+<div id="plbuysell" onclick="javascript: MarkBuySell();">
+	<div class="plblocktitle">
+		BUY/SELL
+		Symbol
+		<select id="symbols">
+		</select>
+		<button id="Buy">Buy</button>
+		<button id="Sell">Sell</button>
+		<form id="bsform">
+			Amount:<input type="text" name="B/SAmount" id="amountinput"/>
+			Price:<input type="text" name="B/SPrice" id= "priceinput"/>
+		</form>
+		<br>
+	</div>
+</div>
 </div>
 
 
 <script>
          $(document).ready(callStat());
+		 $(document).ready(callLogs());
          $(document).ready(getMarketDepth());
 		 $(document).ready(addListeners());
 		 $(document).ready(addBuySellListeners());
+		 $(document).ready($('#plgraph').css({"display":"block"}));
 </script>
 
 </body>

@@ -16,9 +16,9 @@ function addListeners(){
 	}
 	,true);
 	
-	var logButton=document.getElementById("Log");
+	var logButton=document.getElementById("Logs");
     logButton.addEventListener("click",function(){
-			ChangeWindow("#plhistrades");
+			ChangeWindow("#pllogs");
 			}
 	,true);
 	var holdingsButton=document.getElementById("Holdings");
@@ -31,7 +31,11 @@ function addListeners(){
 		    ChangeWindow("#pldividends");
 	        }
 	,true);
-
+	var historyButton=document.getElementById("TradeHistory");
+	historyButton.addEventListener("click",function(){
+		    ChangeWindow("#plhistrades");
+	        }
+	,true);
 }
 
 function showExerciseButton(option){
@@ -72,6 +76,7 @@ function ChangeWindow (win) {
 	$('#plgraph').css({"display":"none"});
     $('#plholdings').css({"display":"none"});
 	$('#pldividends').css({"display":"none"});
+    $('#pllogs').css({"display":"none"});
 //	$('.depositform').css({"display":"none"});
 
 	$(win).css({"display":"block"});
@@ -350,6 +355,27 @@ function callStat(){
 		console.log(errorThrown);
     }
 });
+
+	$.ajax({
+    type: 'POST',
+    url: 'http://localhost:8007/jsonrpc/',
+    //crossDomain: true,
+    data: JSON.stringify({"jsonrpc": "2.0", "method": "echo","params":["hello world"], "id": 1}),
+    dataType: 'json',
+    success: function(responseData, textStatus, jqXHR) {
+		stat=responseData;
+		console.log(responseData);
+		processStat();
+    },
+    error: function (responseData, textStatus, errorThrown) {
+        alert("POST failed.");
+		console.log(responseData);
+		console.log(textStatus);
+		console.log(errorThrown);
+    }
+});
+
+
 }
 
 function processStat(){
@@ -363,4 +389,63 @@ function processStat(){
 	for(var i=0;i<stat.Dividends.length;i++){
 		dividends.innerHTML=dividends.innerHTML+stat.Dividends[i]+"<br>";
 	}
+}
+
+function callLogs(){
+	$.ajax({
+    type: 'POST',
+    url: 'http://localhost:8007/jsonrpc/',
+    //crossDomain: true,
+    data: JSON.stringify({"jsonrpc": "2.0", "method": "sendloglist", "id": 1}),
+    dataType: 'json',
+    success: function(responseData, textStatus, jqXHR) {
+		stat=responseData;
+		console.log(responseData);
+		makeLogList(responseData);
+    },
+    error: function (responseData, textStatus, errorThrown) {
+        alert("POST failed.");
+		console.log(responseData);
+		console.log(textStatus);
+		console.log(errorThrown);
+    }
+});
+    function makeLogList(data){
+		loglist=document.getElementById("loglist");
+		var html;
+		for(var i=0;i<data.result.length;i++){
+			html+="<option>"+data.result[i]+"</option>";
+		}
+		loglist.innerHTML=html;
+		addListenersToLog();
+	}
+    function addListenersToLog(){
+		logs=document.getElementById("loglist").getElementsByTagName("option");
+		for(var i=0;i<logs.length;i++){
+			logs[i].addEventListener("click",function(){
+				logContents=document.getElementById("logcontents");
+					$.ajax({
+						type: 'POST',
+						url: 'http://localhost:8007/jsonrpc/',
+						//crossDomain: true,
+						data: JSON.stringify({"jsonrpc": "2.0", "method": "sendlog","params":[this.value], "id": 1}),
+						dataType: 'json',
+						success: function(responseData, textStatus, jqXHR) {
+							stat=responseData;
+							console.log(responseData);
+							logContents.innerHTML=responseData.result;
+						},
+						error: function (responseData, textStatus, errorThrown) {
+							alert("POST failed.");
+							console.log(responseData);
+							console.log(textStatus);
+							console.log(errorThrown);
+						}
+					});
+
+			}
+			,true);
+
+        }
+    }
 }
