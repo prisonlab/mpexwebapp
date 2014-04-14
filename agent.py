@@ -10,8 +10,8 @@ from mpex import MPEx
 from pyparse import parseStat,parseDeposit,parseOrder,parseExercise
 from getpass import getpass
 from twisted.internet import reactor,ssl
-#, ssl
-from twisted.web import server
+from twisted.web import static,server
+from twisted.application import internet, service
 import traceback
 
 from jsonrpc.server import ServerEvents, JSON_RPC
@@ -624,6 +624,7 @@ def main():
     logging.config.dictConfig(LOGGING)
     observer = twlog.PythonLoggingObserver()
     observer.start()
+    webroot = static.File('/static/web')
 
     args = parse_args()
     try:
@@ -634,10 +635,12 @@ def main():
         mpexagent.passphrase = getpass("Enter your GPG passphrase: ")
         root = JSON_RPC().customize(RPCServer)
         root.eventhandler.agent = mpexagent
-        site = server.Site(root)
+        webroot.putChild('jsonrpc', root)
+        site = server.Site(webroot)
         bindaddr = '*:' if args.listen_addr == '' else args.listen_addr + ':'
         log.info('Listening on %s%d...', bindaddr, args.port)
-        reactor.listenTCP(args.port, site, interface=args.listen_addr)
+#        reactor.listenTCP(args.port, site, interface=args.listen_addr)
+        reactor.listenSSL(args.port,site,ssl.DefaultOpenSSLContextFactory('keys/server.key','keys/server.crt'))
         reactor.run()
     except KeyboardInterrupt:
         print '^C received, shutting down server'

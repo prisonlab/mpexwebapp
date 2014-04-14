@@ -129,7 +129,7 @@ function loadMPSICSymbols(){
 
     var getSymbols=function(){
 	$.ajax({
-		type: "POST",
+		type: "GET",
 		url: "config.conf",
 	    dataType: "text",
 	    error: function(result){
@@ -433,7 +433,7 @@ function callLogs(){
 						success: function(responseData, textStatus, jqXHR) {
 							stat=responseData;
 							console.log(responseData);
-							logContents.innerHTML=responseData.result;
+							logContents.innerHTML=responseData.result.replace(/\n/g,"<br>");
 						},
 						error: function (responseData, textStatus, errorThrown) {
 							alert("POST failed.");

@@ -11,7 +11,7 @@ body { background: gray; }
 
 #plmenu { background: white; box-shadow: 2px 2px black; width: 100%; position: relative; }
 #plbuysell { background: white; width: 100%; position: relative; }
-.plbigblock { width: 100%; position: relative; }
+.plbigblock { width: 100%;height:1000px; position: relative; overflow-y:scroll;}
 #deposit_ammount{ text-align: left}
 
 #plhistrades { background: #FFCCFF; display: none; }
