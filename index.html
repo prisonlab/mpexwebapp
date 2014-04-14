@@ -4,7 +4,6 @@
 <title>MPExAgent FrontEnd</title>
 <link rel="stylesheet" type="text/css" href="plstyle.css">
 <script src="jquery-1.11.0.min.js"></script>
-<script src="jsonrpc.js"></script>
 <script src="pljs.js"></script>
 </head>
 
@@ -64,7 +63,7 @@
 			<form>
 				<input type="text">
 			</form>
-			<button>Deposit</button>
+			<button id= "Deposit">Deposit</button>
 		</div>
 	</div>
 </div>
@@ -134,6 +133,7 @@
 </div>
 
 <script>
+         $(document).ready(initRPC());
          $(document).ready(getMarketDepth());
 		 $(document).ready(addListeners());
 		 $(document).ready(addBuySellListeners());

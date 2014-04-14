@@ -20,19 +20,11 @@ function addListeners(){
 	       	}
 			,true);
 	}
-//	var depositButton=document.getElementsByTagName("button");
- //   console.log(depositButton.length);
-//	$("button[name=Deposit]").
-//	depositButton[0].addEventListener("click",function(){
-//	console.log("i was here");
-	//var form=document.getElementById("depositform");
-	//form.show();
-	//$(".depositform").show();
-//	console.log("and here");
-/*	$("#depositform").css({"display":"block"});
-	console.log("the end");
+	var depositButton=document.getElementById("Deposit");
+	depositButton.addEventListener("click",function(){
+	     $(".depositform").css({"display":"block"});
 	}
-	,true);*/
+	,true);
 	
 }
 
@@ -72,14 +64,13 @@ function ChangeWindow (win) {
 	$('#pltradeoptions').css({"display":"none"});
 	$('#pldepositform').css({"display":"none"});
 	$('#plgraph').css({"display":"none"});
+//	$('.depositform').css({"display":"none"});
 
 	$(win).css({"display":"block"});
-//	$("#depositform").css({"display":"none"});
-	$(".depositform").hide();
 }
 
 //get all MPSIC symbols from mpex.coinbr.com
-function getMPSICSymbols(){
+/*function getMPSICSymbols(){
     var symbols=new Array();
 
     var getSymbols=function(){
@@ -118,6 +109,44 @@ function getMPSICSymbols(){
 		select.innerHTML=html;
 		addListenersToSelect(sym);
 	}
+}*/
+
+function loadMPSICSymbols(){
+	var symbols=new Array();
+
+    var getSymbols=function(){
+	$.ajax({
+		type: "POST",
+		url: "config.conf",
+	    dataType: "text",
+	    error: function(result){
+			console.log("error");
+			console.log(result);
+		},
+		success: function(results){
+			console.log(results);
+			symbols=results.split(',');
+			console.log(symbols);
+
+	        createSelect(symbols);
+		}
+	});
+	}
+		
+
+
+	getSymbols();
+
+	function createSelect(sym){
+		allSymbols=sym;
+        var select=document.getElementById("symbols");
+		var html;
+		for(var i=0;i<sym.length-1;i++){
+			html=html+"<option value=\""+sym[i]+"\">"+sym[i]+"</option>";
+		}
+		select.innerHTML=html;
+		addListenersToSelect(sym);
+	}
 }
 
 function getMarketDepth(){
@@ -135,7 +164,7 @@ function getMarketDepth(){
 			console.log("success");
 			console.log(results);
 			setMarketDepth(results);
-			getMPSICSymbols();
+			loadMPSICSymbols();
 		}
 	});
 }
@@ -220,36 +249,73 @@ function addBuySellListeners(){
 	sell=document.getElementById("Sell");
 
 	buy.addEventListener("click",function(){
-		    //    console.log("buy");
-				histlog=document.getElementById("plhistrades");
-				amountVal=document.getElementById("amountinput").value;
-				symbolVal=document.getElementById("symbols").value;
-				priceVal=document.getElementById("priceinput").value;
-				histlog.innerHTML=histlog.innerHTML+"<br>"+"B "+symbolVal+" "+amountVal+"@"+priceVal+"satoshi";
+		histlog=document.getElementById("plhistrades");
+		amountVal=document.getElementById("amountinput").value;
+		symbolVal=document.getElementById("symbols").value;
+		priceVal=document.getElementById("priceinput").value;
+		histlog.innerHTML=histlog.innerHTML+"<br>"+"B "+symbolVal+" "+amountVal+"@"+priceVal+"satoshi";
+		amountVal=parseFloat(amountVal);
+		priceVal=parseFloat(priceVal);
+
+		$.ajax({
+			type: 'POST',
+			url: 'http://localhost:8007/jsonrpc/',
+			//crossDomain: true,
+			data: JSON.stringify({"jsonrpc": "2.0", "method": "neworder","params":["B",symbolVal,amountVal,priceVal], "id": 1}),
+			dataType: 'json',
+			success: function(responseData, textStatus, jqXHR) {
+				var value = responseData.someKey;
+			},
+			error: function (responseData, textStatus, errorThrown) {
+//				alert("POST failed.");
+				console.log(responseData);
+				console.log(textStatus);
+				console.log(errorThrown);
 			}
+		});
+		//    console.log("buy");
+				}
 			,true);
 
 	sell.addEventListener("click",function(){
-		    //    console.log("sell");
-		       histlog=document.getElementById("plhistrades");
-			   amountVal=document.getElementById("amountinput").value;
-			   symbolVal=document.getElementById("symbols").value;
-		       priceVal=document.getElementById("priceinput").value;
-			   histlog.innerHTML=histlog.innerHTML+"<br>"+"S "+symbolVal+" "+amountVal+"@"+priceVal+"satoshi";
+	   histlog=document.getElementById("plhistrades");
+	   amountVal=document.getElementById("amountinput").value;
+	   symbolVal=document.getElementById("symbols").value;
+	   priceVal=document.getElementById("priceinput").value;
+	   histlog.innerHTML=histlog.innerHTML+"<br>"+"S "+symbolVal+" "+amountVal+"@"+priceVal+"satoshi";
+       amountVal=parseFloat(amountVal);
+	   priceVal=parseFloat(priceVal);
+	   $.ajax({
+			type: 'POST',
+			url: 'http://localhost:8007/jsonrpc/',
+			//crossDomain: true,
+			data: JSON.stringify({"jsonrpc": "2.0", "method": "neworder","params":["S",symbolVal,amountVal,priceVal], "id": 1}),
+			dataType: 'json',
+			success: function(responseData, textStatus, jqXHR) {
+				var value = responseData.someKey;
+			},
+			error: function (responseData, textStatus, errorThrown) {
+//				alert("POST failed.");
+				console.log(responseData);
+				console.log(textStatus);
+				console.log(errorThrown);
 			}
-			,true);
+		});
+
+		}
+		,true);
 }
-/*
+
 function initRPC(){
-	rpcServer=new $.JsonRpcClient({ajaxUrl:"http://localhost/jsonrpc:8007"});
+//	rpcServer=new $.JsonRpcClient({ajaxUrl:"http://localhost/jsonrpc:8007"});
 
 	//console.log(rpcServer);
-	rpcServer.call(
+/*	rpcServer.call(
 			"statjson",[],
 			function (result){console.log("successs"+result);},
 			function (error){console.log("error"+error);}
-			);
-	$.ajax({url: "http://localhost/jsorpc/:8007",
+			);*/
+/*	$.ajax({url: "http://localhost:8007/jsorpc/",
 		type: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({"jsonrpc": "2.0",
@@ -262,19 +328,23 @@ function initRPC(){
 	    error: function(result){
 			console.log(result);
 		}
-	});
+	});*/
 	$.ajax({
     type: 'POST',
-    url: 'http://localhost/jsonrpc/:8007',
-    crossDomain: true,
-    data: '{"some":"json"}',
-    dataType: 'jsonp',
+    url: 'http://localhost:8007/jsonrpc/',
+    //crossDomain: true,
+    data: JSON.stringify({"jsonrpc": "2.0", "method": "echo","params": ["hello"], "id": 1}),
+    dataType: 'json',
     success: function(responseData, textStatus, jqXHR) {
         var value = responseData.someKey;
+		console.log(responseData);
     },
     error: function (responseData, textStatus, errorThrown) {
-        alert('POST failed.');
+        alert("POST failed.");
+		console.log(responseData);
+		console.log(textStatus);
+		console.log(errorThrown);
     }
 });
-}*/
+}
 

@@ -21,5 +21,5 @@ body { background: gray; }
 #pltradeoptions { background: lightgreen; display: none; }
 #pldepositform { background: white; display: none; }
 #plgraph { background: lightblue; display: none; text-align:center; overflow-y:scroll;}
-#depositform { background: white; display: none;}
+.depositform { background: white; display: none;}
 #pltradegraph{ overflow-y: scroll;}
