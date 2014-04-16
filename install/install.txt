@@ -1,0 +1,8 @@
+Installer scripts readme
+Download cygwin installer (http://cygwin.com/setup-x86.exe) into the folder with 
+installation scripts install.bat and cyginst.sh.
+Run install.bat script (internet connection is required).
+Run run.bat script to turn the mpexagent on. (run.sh file has to be in the same
+folder)
+To test if everything is working correctly type localhost:8007 into your web
+browser.

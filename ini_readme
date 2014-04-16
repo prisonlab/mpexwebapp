@@ -19,3 +19,27 @@ webpath- cesta k priecinku s web aplikaciu- 5 suborov: -index.html
 keypath- cesta k suboru s ssl klucom
 certpath- cesta k suboru s ssl certifikatom
 passpath- cesta k suboru s menami a heslami k http autentifikacii
+
+EN:
+mode- noweb - mpex agent works without web frontend
+    - http - web application works over http
+    - https - web application works over https
+auth- noauth - web application works without http authentication
+    - plain - authentication with passwords stored in plain text file:
+      accountname:password in plain text
+    - md5 - authentication with md5 hashed passwords in text file:
+      accountname:hashed password
+    - sha1- authentication with sha1 hashed password in text file:
+      accountname:hashed password
+logpath- path to folder where application logs will be stored
+webpath- path to folder with web application files- 5 necessary files: -index.html
+                                                       -pljs.js
+                                                       -plstyle.css
+                                                       -config.conf
+                                                       -jquery-1.11.0.min.js
+
+keypath- path to file containing ssl key
+certpath- path to file containing ssl certificate
+passpath- path to file containing accounts and passwords, needed for  http
+          authentication
+
